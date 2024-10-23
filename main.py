@@ -49,8 +49,7 @@ print(f1.detalhes)
 class Sala:
     def __init__(self, numero, capacidade):
         pass
-    def OlaMundo(self):
-        return 'Ola Mundo'
+    
 
 
 class Sessao:
