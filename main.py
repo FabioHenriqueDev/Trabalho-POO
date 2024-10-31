@@ -1,5 +1,6 @@
 import sqlite3
 import bcrypt
+import getpass
 import sys
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
@@ -24,14 +25,15 @@ class Usuario(Base):
     nome = Column('nome', String)
     rua = Column('rua', String)
     numero = Column('numero', Integer)
+    email = Column('email', String)
     _senha = Column('senha', String)
     idade = Column('idade', Integer)
-    email = Column('email', String)
-    limite_mensal = Column('limite mensal', Integer)
+    limite_mensal = Column('limite mensal', Float)
+    dinheiro_total = Column('dinheiro total', Float)
     transacoes = relationship("Transacao", back_populates="usuario")
 
     
-    def __init__(self, nome, rua, numero, senha, idade, email, limite_mensal):
+    def __init__(self, nome, rua, numero, senha, idade, email, limite_mensal, dinheiro_total):
         self.nome = nome
         self.rua = rua
         self.numero = numero
@@ -39,6 +41,7 @@ class Usuario(Base):
         self.idade = idade
         self.email = email
         self.limite_mensal = limite_mensal
+        self.dinheiro_total = dinheiro_total
       
     
     
@@ -56,7 +59,7 @@ class Usuario(Base):
     
     def __repr__(self):
         return (f'ID: {self.id}\nNome: {self.nome}\nRua: {self.rua}\nNumero: {self.numero}\n'
-                f'Idade: {self.idade}\nEmail: {self.email}\nSenha: {self.senha.setter}Limite Mensal: {self.limite_mensal}')
+                f'Idade: {self.idade}\nEmail: {self.email}\nSenha: {self.senha.setter}Limite Mensal: {self.limite_mensal}\nDinheiro total: {self.dinheiro_total}')
 
 
 class Transacao(Base):
@@ -112,28 +115,34 @@ Base.metadata.create_all(engine)# Criação das tabelas no banco de dados
 # session.add(u1)
 # session.commit()
 
-import sys
+
 
 def adicionar_usuario():
     try:
         
         nome = input('Digite seu nome: ')
+        print(90 * '--')
         rua = input('Digite sua rua: ')
+        print(90 * '--')
 
         
         try:
             numero = int(input('Digite o seu número: '))
+            print(90 * '--')
         except ValueError:
             print('Erro: Digite um número válido para o número da rua.')
             sys.exit()  
 
         
-        email = input('Digite o email: ')
-        senha = input("Digite sua senha: ")
+        email = input('Digite o email: ').lower()
+        print(90 * '--')
+        senha = getpass.getpass("Digite sua senha: ")
+        print(90 * '--')
 
        
         try:
             idade = int(input("Digite sua idade: "))
+            print(90 * '--')
             if idade < 18:
                 print('Você não pode ser cadastrado, porque é menor de idade :(')
                 sys.exit()
@@ -144,9 +153,17 @@ def adicionar_usuario():
        
         try:
             limite_mensal = int(input("Digite seu limite mensal: "))
+            print(90 * '--')
         except ValueError:
             print('Erro: Digite um número válido para o limite mensal.')
             sys.exit()
+
+        try:
+            dinheiro_total = int(input("Digite seu dinheiro total: "))
+            print(90 * '--')
+        
+        except ValueError:
+            print('Erro: Digite números válidos')
 
         
         usuario = Usuario(
@@ -156,7 +173,8 @@ def adicionar_usuario():
             email=email,
             senha=senha,
             idade=idade,
-            limite_mensal=limite_mensal
+            limite_mensal=limite_mensal,
+            dinheiro_total = dinheiro_total
         )
 
         
