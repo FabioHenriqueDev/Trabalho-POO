@@ -1,5 +1,6 @@
 import sqlite3
 import bcrypt
+import sys
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
@@ -19,16 +20,28 @@ transacao_produto_associacao = Table(
 class Usuario(Base):
     __tablename__ = "usuarios"
 
-    id = Column(Integer, primary_key=True)
-    nome = Column(String)
-    rua = Column(String)
-    numero = Column(Integer)
-    _senha = Column(String)
-    idade = Column(Integer)
-    email = Column(String)
-    limite_mensal = Column(Integer)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    nome = Column('nome', String)
+    rua = Column('rua', String)
+    numero = Column('numero', Integer)
+    _senha = Column('senha', String)
+    idade = Column('idade', Integer)
+    email = Column('email', String)
+    limite_mensal = Column('limite mensal', Integer)
     transacoes = relationship("Transacao", back_populates="usuario")
 
+    
+    def __init__(self, nome, rua, numero, senha, idade, email, limite_mensal):
+        self.nome = nome
+        self.rua = rua
+        self.numero = numero
+        self._senha = senha
+        self.idade = idade
+        self.email = email
+        self.limite_mensal = limite_mensal
+      
+    
+    
     @property
     def senha(self):
         return self._senha
@@ -43,20 +56,30 @@ class Usuario(Base):
     
     def __repr__(self):
         return (f'ID: {self.id}\nNome: {self.nome}\nRua: {self.rua}\nNumero: {self.numero}\n'
-                f'Idade: {self.idade}\nEmail: {self.email}\nSenha : {self.senha.setter}Limite Mensal: {self.limite_mensal}')
+                f'Idade: {self.idade}\nEmail: {self.email}\nSenha: {self.senha.setter}Limite Mensal: {self.limite_mensal}')
 
 
 class Transacao(Base):
     __tablename__ = "transacoes"
 
-    id = Column(Integer, primary_key=True)
-    valor = Column(Float)
-    tipo_pagamento = Column(String)
-    data_transacao = Column(String)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    valor = Column('valor', Float)
+    tipo_pagamento = Column('tipo de pagamento', String)
+    data_transacao = Column('data da transação', String)
     usuario_id = Column(Integer, ForeignKey('usuarios.id'))
     usuario = relationship("Usuario", back_populates="transacoes")
     produtos = relationship("Produto", secondary=transacao_produto_associacao, back_populates="transacoes")# Relação muitos-para-muitos com Produto
 
+    
+    def __init__(self, valor, tipo_pagamento, data_transacao, usuario_id):
+
+        self.valor = valor
+        self.tipo_pagamento = tipo_pagamento
+        self.data_transacao = data_transacao
+        self.usuario_id = usuario_id
+        
+    
+    
     def __repr__(self):
         return (f'ID: {self.id}\nValor: {self.valor}\nTipo de Pagamento: {self.tipo_pagamento}\n'
                 f'Data da Transação: {self.data_transacao}\n')
@@ -65,32 +88,114 @@ class Transacao(Base):
 class Produto(Base):
     __tablename__ = "produtos"
 
-    id = Column(Integer, primary_key=True)
-    valor_produto = Column(Integer)
-    nome_produto = Column(String)
-    quantidade = Column(Integer)
+    id = Column('id', Integer, primary_key=True, autoincrement=True)
+    valor_produto = Column('valor do produto', Integer)
+    nome_produto = Column('nome do produto', String)
+    quantidade = Column('quantidade', Integer)
     transacoes = relationship("Transacao", secondary=transacao_produto_associacao, back_populates="produtos")# Relação muitos-para-muitos com Transacao
 
+    def __init__(self, valor_produto, nome_produto, quantidade, transacoes):
+
+        self.valor_produto = valor_produto
+        self.nome_produto = nome_produto
+        self.quantidade = quantidade
+        self.transacoes = transacoes
+    
+    
     def __repr__(self):
         return f'ID: {self.id}\n Valor do Produto: {self.valor_produto}\nQuantidade: {self.quantidade}'
 
 
 Base.metadata.create_all(engine)# Criação das tabelas no banco de dados
 
-def adicionar_usuário(id, nome, rua, numero, senha, idade, email, limite_mensal):
-      
-    usuario = session.query(Usuario).filter_by(id=id, nome=nome, rua=rua, numero=numero, senha=senha, idade=idade, email=email, limite_mensal=limite_mensal).first()
-    usuario.senha = senha
-    session.add(usuario)
-    session.commit()
+# u1 = Usuario(nome='Fábio', rua='Rua Penha', numero=12, senha='senha123', idade=19, email='fabio.gmail.com', limite_mensal=18000)
+# session.add(u1)
+# session.commit()
+
+import sys
+
+def adicionar_usuario():
+    try:
         
-def adicionar_transacao(id, valor, tipo_pagamento, data_transacao, usuario_id, produtos):
+        nome = input('Digite seu nome: ')
+        rua = input('Digite sua rua: ')
+
+        
+        try:
+            numero = int(input('Digite o seu número: '))
+        except ValueError:
+            print('Erro: Digite um número válido para o número da rua.')
+            sys.exit()  
+
+        
+        email = input('Digite o email: ')
+        senha = input("Digite sua senha: ")
+
+       
+        try:
+            idade = int(input("Digite sua idade: "))
+            if idade < 18:
+                print('Você não pode ser cadastrado, porque é menor de idade :(')
+                sys.exit()
+        except ValueError:
+            print('Erro: Digite um número válido para a idade.')
+            sys.exit()
+
+       
+        try:
+            limite_mensal = int(input("Digite seu limite mensal: "))
+        except ValueError:
+            print('Erro: Digite um número válido para o limite mensal.')
+            sys.exit()
+
+        
+        usuario = Usuario(
+            nome=nome,
+            rua=rua,
+            numero=numero,
+            email=email,
+            senha=senha,
+            idade=idade,
+            limite_mensal=limite_mensal
+        )
+
+        
+        usuario.senha = senha
+        session.add(usuario)
+        session.commit()
+        print("Usuário adicionado com sucesso!")
+
+    finally:
+        print('Fim da execução.')
+
+adicionar_usuario()
+
+
+
+
+        
+
+
+
+
+
+
+
+
+
+
+
+# def adicionar_usuário(id, nome, rua, numero, senha, idade, email, limite_mensal):
+      
+#     usuario = session.query(Usuario).filter_by(id=id, nome=nome, rua=rua, numero=numero, senha=senha, idade=idade, email=email, limite_mensal=limite_mensal).first()
+#     usuario.senha = senha
+#     session.add(usuario)
+#     session.commit()
+        
+# def adicionar_transacao(id, valor, tipo_pagamento, data_transacao, usuario_id, produtos):
     
-    
-    
-    
-    transacao = session.query(Transacao).filter_by(id=id, valor=valor, tipo_pagamento=tipo_pagamento, data_transacao=data_transacao, usuario_id=usuario_id, produtos=produtos).first()
-    session.add(transacao)
-    session.commit()
+#     transacao = session.query(Transacao).filter_by(id=id, valor=valor, tipo_pagamento=tipo_pagamento, data_transacao=data_transacao, usuario_id=usuario_id, produtos=produtos).first()
+#     session.add(transacao)
+#     session.commit()
 
 
