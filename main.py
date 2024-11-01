@@ -1,7 +1,7 @@
-import sqlite3
 import bcrypt
 import getpass
 import sys
+from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Table
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
@@ -118,6 +118,13 @@ Base.metadata.create_all(engine)# Criação das tabelas no banco de dados
 
 
 def adicionar_usuario():
+    
+    print(25 * '-')
+    print('| CADASTRO DE USUÁRIOS  |')  
+    print(25 * '-')
+
+
+    
     try:
         
         nome = input('Digite seu nome: ')
@@ -127,7 +134,7 @@ def adicionar_usuario():
 
         
         try:
-            numero = int(input('Digite o seu número: '))
+            numero = int(input('Digite o seu número do seu endereço: '))
             print(90 * '--')
         except ValueError:
             print('Erro: Digite um número válido para o número da rua.')
@@ -159,7 +166,7 @@ def adicionar_usuario():
             sys.exit()
 
         try:
-            dinheiro_total = int(input("Digite seu dinheiro total: "))
+            dinheiro_total = float(input("Digite seu dinheiro total: "))
             print(90 * '--')
         
         except ValueError:
@@ -185,13 +192,75 @@ def adicionar_usuario():
 
     finally:
         print('Fim da execução.')
+        print(90 * '--')
+    
+    
+
+
+    def adicionar_transacao():
+        
+        import sys
+
+        pergunta = input("Você quer fazer alguma transação? S/N ").upper()
+
+        if pergunta.startswith('S'):
+            pass
+
+        elif pergunta.startswith('N'):
+            print('Ok, acabando a execução do programa.')
+            sys.exit()
+
+        else:
+            print('Você não selecionou nenhuma das opções válidas. Parando a execução do programa.')
+            sys.exit()
+
+        
+        
+        try:
+            valor = float(input("Digite o valor da transação: "))
+            print(90 * '--')
+        
+        except ValueError:
+            print('Digite um número válido.')
+            sys.exit()
+
+        if usuario.dinheiro_total >= valor:
+            usuario.dinheiro_total -= valor
+        
+        else:
+            print('Você não tem dinheiro o suficiente para fazer essa compra')
+            sys.exit()
+        
+        tipo_pagamento = input('Digite o tipo de pagamento(pix, cartao, boleto, etc): ')
+        print(90 * '--')
+        data_transacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
+        dono = usuario.id
+
+        
+        
+        
+        transacao = Transacao(
+            
+            valor=valor,
+            tipo_pagamento = tipo_pagamento,
+            data_transacao = data_transacao,
+            usuario_id = dono
+
+        )
+
+        session.add(transacao)
+        session.commit()
+        print('Transação adicionada com sucesso')
+
+    adicionar_transacao()
+    
+    
 
 adicionar_usuario()
 
 
 
 
-        
 
 
 
@@ -199,21 +268,5 @@ adicionar_usuario()
 
 
 
-
-
-
-
-# def adicionar_usuário(id, nome, rua, numero, senha, idade, email, limite_mensal):
-      
-#     usuario = session.query(Usuario).filter_by(id=id, nome=nome, rua=rua, numero=numero, senha=senha, idade=idade, email=email, limite_mensal=limite_mensal).first()
-#     usuario.senha = senha
-#     session.add(usuario)
-#     session.commit()
-        
-# def adicionar_transacao(id, valor, tipo_pagamento, data_transacao, usuario_id, produtos):
-    
-#     transacao = session.query(Transacao).filter_by(id=id, valor=valor, tipo_pagamento=tipo_pagamento, data_transacao=data_transacao, usuario_id=usuario_id, produtos=produtos).first()
-#     session.add(transacao)
-#     session.commit()
 
 
