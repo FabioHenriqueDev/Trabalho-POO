@@ -91,16 +91,15 @@ class Produto(Base):
     __tablename__ = "produtos"
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
-    valor_produto = Column('valor do produto', Integer)
     nome_produto = Column('nome do produto', String)
     quantidade = Column('quantidade', Integer)
     usuario_id = Column(ForeignKey('usuarios.id'))
     transacao_id = Column(ForeignKey('transacoes.id'))
     transacoes = relationship("Transacao", back_populates="produtos")# Relação muitos-para-muitos com Transacao
 
-    def __init__(self, valor_produto, nome_produto, quantidade, transacoes_id, usuario_id):
+    def __init__(self, nome_produto, quantidade, transacoes_id, usuario_id):
 
-        self.valor_produto = valor_produto
+        
         self.nome_produto = nome_produto
         self.quantidade = quantidade
         self.transacoes_id = transacoes_id
@@ -253,7 +252,7 @@ def adicionar_usuario():
         
         session.add(transacao)
         session.flush()
-        print('Transação adicionada com sucesso')
+        
 
         
         
@@ -261,21 +260,14 @@ def adicionar_usuario():
         def adicionar_produtos():
                 dono_transacao = transacao.id
                 nome_produto = input("Digite o nome do produto: ")
+                print(90 * '--')
                     
-                try:
-                    valor_produto = float(input("Digite o valor do produto por unidade: "))
-                    print(90 * '--')
-                    
-                except ValueError:
-                    print("Digite números válidos para o valor do produto")
-                    sys.exit()
-                    
+               
                 try:
                     quantidade = int(input("Digite a quantidade do produto que você comprou: "))
                     print(90 * '--')
 
-                    if quantidade > 1:
-                        valor_produto = valor_produto * quantidade
+                   
 
                 except ValueError:
                     print('Digite um número válido para a quantidade de produtos')
@@ -283,7 +275,7 @@ def adicionar_usuario():
                     
                 produtos = Produto(
                     nome_produto = nome_produto,
-                    valor_produto = valor_produto,
+                    
                     quantidade = quantidade,
                     transacoes_id = dono_transacao,
                     usuario_id = dono
@@ -294,6 +286,8 @@ def adicionar_usuario():
                 session.add(produtos)
                     
                 session.commit()
+                
+                print('Transação adicionada com sucesso')
                 
                 if quantidade > 1:
                     print('Produtos cadastrados com sucesso!')
