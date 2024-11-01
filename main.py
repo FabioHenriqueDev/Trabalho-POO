@@ -11,12 +11,6 @@ Session = sessionmaker(bind=engine)
 session = Session()
 Base = declarative_base()
 
-# Tabela de associação para a relação muitos-para-muitos entre Transacao e Produto
-transacao_produto_associacao = Table(
-    'transacao_produto', Base.metadata,
-    Column('transacao_id', Integer, ForeignKey('transacoes.id'), primary_key=True),
-    Column('produto_id', Integer, ForeignKey('produtos.id'), primary_key=True)
-)
 
 class Usuario(Base):
     __tablename__ = "usuarios"
@@ -71,7 +65,7 @@ class Transacao(Base):
     data_transacao = Column('data da transação', String)
     usuario_id = Column(Integer, ForeignKey('usuarios.id'))
     usuario = relationship("Usuario", back_populates="transacoes")
-    produtos = relationship("Produto", secondary=transacao_produto_associacao, back_populates="transacoes")# Relação muitos-para-muitos com Produto
+    produtos = relationship("Produto", back_populates="transacoes")
 
     
     def __init__(self, valor, tipo_pagamento, data_transacao, usuario_id):
@@ -80,6 +74,11 @@ class Transacao(Base):
         self.tipo_pagamento = tipo_pagamento
         self.data_transacao = data_transacao
         self.usuario_id = usuario_id
+        
+    
+    @property
+    def get_id(self):
+        return self.id
         
     
     
@@ -95,14 +94,17 @@ class Produto(Base):
     valor_produto = Column('valor do produto', Integer)
     nome_produto = Column('nome do produto', String)
     quantidade = Column('quantidade', Integer)
-    transacoes = relationship("Transacao", secondary=transacao_produto_associacao, back_populates="produtos")# Relação muitos-para-muitos com Transacao
+    usuario_id = Column(ForeignKey('usuarios.id'))
+    transacao_id = Column(ForeignKey('transacoes.id'))
+    transacoes = relationship("Transacao", back_populates="produtos")# Relação muitos-para-muitos com Transacao
 
-    def __init__(self, valor_produto, nome_produto, quantidade, transacoes):
+    def __init__(self, valor_produto, nome_produto, quantidade, transacoes_id, usuario_id):
 
         self.valor_produto = valor_produto
         self.nome_produto = nome_produto
         self.quantidade = quantidade
-        self.transacoes = transacoes
+        self.transacoes_id = transacoes_id
+        self.usuario_id = usuario_id
     
     
     def __repr__(self):
@@ -127,7 +129,7 @@ def adicionar_usuario():
     
     try:
         
-        nome = input('Digite seu nome: ')
+        nome = input('Digite seu nome completo: ')
         print(90 * '--')
         rua = input('Digite sua rua: ')
         print(90 * '--')
@@ -199,7 +201,7 @@ def adicionar_usuario():
 
     def adicionar_transacao():
         
-        import sys
+        
 
         pergunta = input("Você quer fazer alguma transação? S/N ").upper()
 
@@ -248,12 +250,64 @@ def adicionar_usuario():
 
         )
 
+        
         session.add(transacao)
-        session.commit()
+        session.flush()
         print('Transação adicionada com sucesso')
 
+        
+        
+
+        def adicionar_produtos():
+                dono_transacao = transacao.id
+                nome_produto = input("Digite o nome do produto: ")
+                    
+                try:
+                    valor_produto = float(input("Digite o valor do produto por unidade: "))
+                    print(90 * '--')
+                    
+                except ValueError:
+                    print("Digite números válidos para o valor do produto")
+                    sys.exit()
+                    
+                try:
+                    quantidade = int(input("Digite a quantidade do produto que você comprou: "))
+                    print(90 * '--')
+
+                    if quantidade > 1:
+                        valor_produto = valor_produto * quantidade
+
+                except ValueError:
+                    print('Digite um número válido para a quantidade de produtos')
+
+                    
+                produtos = Produto(
+                    nome_produto = nome_produto,
+                    valor_produto = valor_produto,
+                    quantidade = quantidade,
+                    transacoes_id = dono_transacao,
+                    usuario_id = dono
+
+                        
+                )
+
+                session.add(produtos)
+                    
+                session.commit()
+                
+                if quantidade > 1:
+                    print('Produtos cadastrados com sucesso!')
+                    
+                elif quantidade == 1:
+                    print("Produto cadastrado com sucesso!")
+            
+        
+        adicionar_produtos()
+            
+            
+
+
     adicionar_transacao()
-    
     
 
 adicionar_usuario()
