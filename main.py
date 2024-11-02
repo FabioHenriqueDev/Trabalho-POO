@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
-# Configuração do banco de dados
+
 engine = create_engine("sqlite:///gestao_financeira.db")
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -95,7 +95,7 @@ class Produto(Base):
     quantidade = Column('quantidade', Integer)
     usuario_id = Column(ForeignKey('usuarios.id'))
     transacao_id = Column(ForeignKey('transacoes.id'))
-    transacoes = relationship("Transacao", back_populates="produtos")# Relação muitos-para-muitos com Transacao
+    transacoes = relationship("Transacao", back_populates="produtos")
 
     def __init__(self, nome_produto, quantidade, transacao_id, usuario_id):
 
@@ -112,9 +112,7 @@ class Produto(Base):
 
 Base.metadata.create_all(engine)# Criação das tabelas no banco de dados
 
-# u1 = Usuario(nome='Fábio', rua='Rua Penha', numero=12, senha='senha123', idade=19, email='fabio.gmail.com', limite_mensal=18000)
-# session.add(u1)
-# session.commit()
+
 
 
 
@@ -249,6 +247,7 @@ def adicionar_usuario():
 
     def adicionar_transacao():
         pergunta = input("Você quer fazer alguma transação? S/N ").upper()
+        gastos_usuario = 0
 
         if pergunta.startswith('S'):
             pass
@@ -263,8 +262,9 @@ def adicionar_usuario():
 
         try:
             valor = float(input("Digite o valor da transação: "))
+            
 
-            if valor >= usuario.limite_mensal:
+            if gastos_usuario + valor >= usuario.limite_mensal:
                 pergunta = input("Essa transação vai passar do seu limite mensal, você tem certeza que quer executala? S/N: ").upper()
                 
                 if pergunta == 'S':
@@ -320,6 +320,7 @@ def adicionar_usuario():
             usuario_id=dono
         )
 
+        
         session.add(transacao)
         session.flush()
         session.commit()
