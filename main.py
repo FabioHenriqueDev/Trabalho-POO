@@ -1,7 +1,10 @@
 import bcrypt
-import getpass
 import sys
 from datetime import datetime
+import smtplib
+import email.message 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
@@ -150,8 +153,8 @@ def adicionar_usuario():
         
         
         print(90 * '--')
-        senha = getpass.getpass("Digite sua senha: ")
-        confirme_senha = getpass.getpass("Confirme sua senha: ")
+        senha = input("Digite sua senha: ")
+        confirme_senha = input("Confirme sua senha: ")
         if senha == confirme_senha:
             print('senha adicionada com sucesso.')
             pass
@@ -206,6 +209,43 @@ def adicionar_usuario():
         session.commit()
         print("Usuário adicionado com sucesso!")
 
+        remetente = usuario.email
+        senha_remetente = 'rwwwrfybejqwgies'
+        destinatario = usuario.email
+        print('Pegando dados do email...\n\nIsso pode demorar alguns instantes')
+        
+        #criação da mensagem de email
+        mensagem = MIMEMultipart()
+        mensagem["From"] = remetente
+        mensagem["To"] = destinatario
+        mensagem["Subject"] = "Confirmação de email"
+
+        #corpo do email
+        corpo_email = f'''
+            <p>Prezados,</p>
+
+            <p>Obrigado por se cadastrar no nosso sistema!</p>
+            {usuario.nome}
+            '''
+        
+        mensagem.attach(MIMEText(corpo_email, "html"))
+        try:
+            #Conexão com servidor smtp
+            with smtplib.SMTP("smtp.gmail.com", 587) as servidor:
+                servidor.starttls() #Ativa a segurança TLS
+                servidor.login(remetente, senha_remetente)
+                servidor.sendmail(remetente, destinatario, mensagem.as_string())#Enviando email
+                print(f'{usuario.nome}, um email foi enviado para o endereço: {usuario.email}.')
+        
+        except Exception as e:
+            print(f"Erro ao enviar o email {e}")
+
+        
+
+
+
+
+
     finally:
         print('Fim da execução.')
         print(90 * '--')
@@ -216,7 +256,7 @@ def adicionar_usuario():
         print(25 * '-')
 
         email = input("Digite seu email: ").strip().lower()
-        senha = getpass.getpass("Digite sua senha: ")
+        senha = input("Digite sua senha: ")
 
         
         if '@' not in email or '.' not in email:
@@ -324,6 +364,8 @@ def adicionar_usuario():
         session.add(transacao)
         session.flush()
         session.commit()
+
+        
 
         def adicionar_produtos():
             nome_produto = input("Digite o nome do produto: ")
