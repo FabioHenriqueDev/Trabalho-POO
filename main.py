@@ -47,7 +47,7 @@ class Usuario(Base):
     def senha(self, senha):
         hashed = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
         self._senha = hashed.decode('utf-8')
-        print('Senha colocada com sucesso!')
+        
 
     
     
@@ -97,12 +97,12 @@ class Produto(Base):
     transacao_id = Column(ForeignKey('transacoes.id'))
     transacoes = relationship("Transacao", back_populates="produtos")# Relação muitos-para-muitos com Transacao
 
-    def __init__(self, nome_produto, quantidade, transacoes_id, usuario_id):
+    def __init__(self, nome_produto, quantidade, transacao_id, usuario_id):
 
         
         self.nome_produto = nome_produto
         self.quantidade = quantidade
-        self.transacoes_id = transacoes_id
+        self.transacao_id = transacao_id
         self.usuario_id = usuario_id
     
     
@@ -143,8 +143,27 @@ def adicionar_usuario():
 
         
         email = input('Digite o email: ').lower()
+        
+        if '@' not in email:
+            print('Erro: Email inválido, deve sempre conter @')
+            sys.exit()
+        
+        elif '.' not in email:
+            print("Erro: Email deve conter o .")
+            sys.exit()
+        
+        
         print(90 * '--')
         senha = getpass.getpass("Digite sua senha: ")
+        confirme_senha = getpass.getpass("Confirme sua senha: ")
+        if senha == confirme_senha:
+            print('senha adicionada com sucesso.')
+            pass
+        
+        else:
+            print("As senhas nao se coincidem.")
+            sys.exit()
+
         print(90 * '--')
 
        
@@ -232,7 +251,29 @@ def adicionar_usuario():
             print('Você não tem dinheiro o suficiente para fazer essa compra')
             sys.exit()
         
-        tipo_pagamento = input('Digite o tipo de pagamento(pix, cartao, boleto, etc): ')
+        tipo_pagamento = input('Qual foi seu tipo de pagamento?\n\n1.Pix\n2.Cartão de débito\n3.Cartão de crédito\n4.Transferência\n5.Outro\nDigite uma das opções: ')
+
+        if tipo_pagamento == '1':
+            tipo_pagamento = 'Pix'
+        
+        elif tipo_pagamento == '2':
+            tipo_pagamento = 'Cartão de débito'
+        
+        elif tipo_pagamento == '3':
+            tipo_pagamento = 'Cartão de crédito'
+        
+        elif tipo_pagamento == '4':
+            tipo_pagamento = 'Transferência'
+
+        elif tipo_pagamento == '5':
+            digite_forma_pagamento = input("Digite outra forma de pagamento: ")
+            tipo_pagamento = digite_forma_pagamento
+        
+        else:
+            print('Você não digitou nenhuma das opções parando a execução do programa.')
+            sys.exit()
+
+
         print(90 * '--')
         data_transacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
         dono = usuario.id
@@ -252,12 +293,14 @@ def adicionar_usuario():
         
         session.add(transacao)
         session.flush()
+        session.commit()
         
 
         
         
 
         def adicionar_produtos():
+                
                 dono_transacao = transacao.id
                 nome_produto = input("Digite o nome do produto: ")
                 print(90 * '--')
@@ -272,18 +315,18 @@ def adicionar_usuario():
                 except ValueError:
                     print('Digite um número válido para a quantidade de produtos')
 
-                    
+                  
                 produtos = Produto(
                     nome_produto = nome_produto,
-                    
                     quantidade = quantidade,
-                    transacoes_id = dono_transacao,
+                    transacao_id = transacao.id,
                     usuario_id = dono
 
                         
                 )
 
                 session.add(produtos)
+                
                     
                 session.commit()
                 
