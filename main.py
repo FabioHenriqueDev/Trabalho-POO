@@ -124,8 +124,6 @@ def adicionar_usuario():
     print('| CADASTRO DE USUÁRIOS  |')  
     print(25 * '-')
 
-
-    
     try:
         
         nome = input('Digite seu nome completo: ')
@@ -201,7 +199,7 @@ def adicionar_usuario():
             senha=senha,
             idade=idade,
             limite_mensal=limite_mensal,
-            dinheiro_total = dinheiro_total
+            dinheiro_total=dinheiro_total
         )
 
         
@@ -213,15 +211,43 @@ def adicionar_usuario():
     finally:
         print('Fim da execução.')
         print(90 * '--')
-    
-    
 
+    def login():
+        print(25 * '-')
+        print('| LOGIN DE USUÁRIO      |')
+        print(25 * '-')
+
+        email = input("Digite seu email: ").strip().lower()
+        senha = getpass.getpass("Digite sua senha: ")
+
+        
+        if '@' not in email or '.' not in email:
+            print("Erro: Email inválido. Deve conter '@' e '.'.")
+            return
+
+        try:
+            
+            usuario = session.query(Usuario).filter_by(email=email).first()
+
+            if not usuario:
+                print("Erro: Usuário não encontrado.")
+                return
+
+            
+            if bcrypt.checkpw(senha.encode('utf-8'), usuario._senha.encode('utf-8')):
+                print("Usuário autorizado!")
+                print(f"Bem-vindo, {usuario.nome} (ID: {usuario.id})")
+                adicionar_transacao()
+                return usuario  
+            else:
+                print("Erro: Senha incorreta.")
+                return
+
+        except Exception as e:
+            print(f"Ocorreu um erro durante o login: {e}")
+            return
 
     def adicionar_transacao():
-        
-        
-        
-
         pergunta = input("Você quer fazer alguma transação? S/N ").upper()
 
         if pergunta.startswith('S'):
@@ -235,14 +261,11 @@ def adicionar_usuario():
             print('Você não selecionou nenhuma das opções válidas. Parando a execução do programa.')
             sys.exit()
 
-        
-        
         try:
             valor = float(input("Digite o valor da transação: "))
 
             if valor >= usuario.limite_mensal:
                 pergunta = input("Essa transação vai passar do seu limite mensal, você tem certeza que quer executala? S/N: ").upper()
-                #armazenar_dinheiro_gasto = armazenar_dinheiro_gasto + valor
                 
                 if pergunta == 'S':
                     pass
@@ -286,122 +309,57 @@ def adicionar_usuario():
             print('Você não digitou nenhuma das opções parando a execução do programa.')
             sys.exit()
 
-
         print(90 * '--')
         data_transacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
         dono = usuario.id
 
-        
-        
-        
         transacao = Transacao(
-            
             valor=valor,
-            tipo_pagamento = tipo_pagamento,
-            data_transacao = data_transacao,
-            usuario_id = dono
-
+            tipo_pagamento=tipo_pagamento,
+            data_transacao=data_transacao,
+            usuario_id=dono
         )
 
-        
         session.add(transacao)
         session.flush()
         session.commit()
-        
-
-        
-        
 
         def adicionar_produtos():
+            nome_produto = input("Digite o nome do produto: ")
+            print(90 * '--')
                 
-                
-                nome_produto = input("Digite o nome do produto: ")
+            try:
+                quantidade = int(input("Digite a quantidade do produto que você comprou: "))
                 print(90 * '--')
-                    
-               
-                try:
-                    quantidade = int(input("Digite a quantidade do produto que você comprou: "))
-                    print(90 * '--')
 
-                   
-
-                except ValueError:
-                    print('Digite um número válido para a quantidade de produtos')
-
+            except ValueError:
+                print('Digite um número válido para a quantidade de produtos')
                   
-                produtos = Produto(
-                    nome_produto = nome_produto,
-                    quantidade = quantidade,
-                    transacao_id = transacao.id,
-                    usuario_id = dono
+            produtos = Produto(
+                nome_produto=nome_produto,
+                quantidade=quantidade,
+                transacao_id=transacao.id,
+                usuario_id=dono
+            )
 
-                        
-                )
-
-                session.add(produtos)
-                
-                    
-                session.commit()
-                
-                print('Transação adicionada com sucesso')
-                
-                if quantidade > 1:
-                    print('Produtos cadastrados com sucesso!')
-                    
-                elif quantidade == 1:
-                    print("Produto cadastrado com sucesso!")
+            session.add(produtos)
+            session.commit()
             
+            print('Transação adicionada com sucesso')
+            
+            if quantidade > 1:
+                print('Produtos cadastrados com sucesso!')
+                
+            elif quantidade == 1:
+                print("Produto cadastrado com sucesso!")
         
-        #adicionar_produtos()
+        adicionar_produtos()
             
-            
+    adicionar_transacao()
+    login()
 
+adicionar_usuario()
 
-    #adicionar_transacao()
-    
-
-#adicionar_usuario()
-
-
-
-
-
-
-def login():
-    print(25 * '-')
-    print('| LOGIN DE USUÁRIO      |')
-    print(25 * '-')
-
-    email = input("Digite seu email: ").strip().lower()
-    senha = getpass.getpass("Digite sua senha: ")
-
-    # Validação básica do email
-    if '@' not in email or '.' not in email:
-        print("Erro: Email inválido. Deve conter '@' e '.'.")
-        return
-
-    try:
-        # Consultar o usuário pelo email
-        usuario = session.query(Usuario).filter_by(email=email).first()
-
-        if not usuario:
-            print("Erro: Usuário não encontrado.")
-            return
-
-        # Verificar a senha usando bcrypt
-        if bcrypt.checkpw(senha.encode('utf-8'), usuario._senha.encode('utf-8')):
-            print("Usuário autorizado!")
-            print(f"Bem-vindo, {usuario.nome} (ID: {usuario.id})")
-            return usuario  # Retorna o objeto usuário para uso posterior, se necessário
-        else:
-            print("Erro: Senha incorreta.")
-            return
-
-    except Exception as e:
-        print(f"Ocorreu um erro durante o login: {e}")
-        return
-
-login()
 
 
 
