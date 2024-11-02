@@ -2,7 +2,7 @@ import bcrypt
 import getpass
 import sys
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Table
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 
 # Configuração do banco de dados
@@ -220,6 +220,7 @@ def adicionar_usuario():
     def adicionar_transacao():
         
         
+        
 
         pergunta = input("Você quer fazer alguma transação? S/N ").upper()
 
@@ -238,6 +239,18 @@ def adicionar_usuario():
         
         try:
             valor = float(input("Digite o valor da transação: "))
+
+            if valor >= usuario.limite_mensal:
+                pergunta = input("Essa transação vai passar do seu limite mensal, você tem certeza que quer executala? S/N: ").upper()
+                #armazenar_dinheiro_gasto = armazenar_dinheiro_gasto + valor
+                
+                if pergunta == 'S':
+                    pass
+
+                elif pergunta == 'N':
+                    print('Transação cancelada com sucesso.')
+                    sys.exit()
+
             print(90 * '--')
         
         except ValueError:
@@ -301,7 +314,7 @@ def adicionar_usuario():
 
         def adicionar_produtos():
                 
-                dono_transacao = transacao.id
+                
                 nome_produto = input("Digite o nome do produto: ")
                 print(90 * '--')
                     
@@ -339,15 +352,56 @@ def adicionar_usuario():
                     print("Produto cadastrado com sucesso!")
             
         
-        adicionar_produtos()
+        #adicionar_produtos()
             
             
 
 
-    adicionar_transacao()
+    #adicionar_transacao()
     
 
-adicionar_usuario()
+#adicionar_usuario()
+
+
+
+
+
+
+def login():
+    print(25 * '-')
+    print('| LOGIN DE USUÁRIO      |')
+    print(25 * '-')
+
+    email = input("Digite seu email: ").strip().lower()
+    senha = getpass.getpass("Digite sua senha: ")
+
+    # Validação básica do email
+    if '@' not in email or '.' not in email:
+        print("Erro: Email inválido. Deve conter '@' e '.'.")
+        return
+
+    try:
+        # Consultar o usuário pelo email
+        usuario = session.query(Usuario).filter_by(email=email).first()
+
+        if not usuario:
+            print("Erro: Usuário não encontrado.")
+            return
+
+        # Verificar a senha usando bcrypt
+        if bcrypt.checkpw(senha.encode('utf-8'), usuario._senha.encode('utf-8')):
+            print("Usuário autorizado!")
+            print(f"Bem-vindo, {usuario.nome} (ID: {usuario.id})")
+            return usuario  # Retorna o objeto usuário para uso posterior, se necessário
+        else:
+            print("Erro: Senha incorreta.")
+            return
+
+    except Exception as e:
+        print(f"Ocorreu um erro durante o login: {e}")
+        return
+
+login()
 
 
 
