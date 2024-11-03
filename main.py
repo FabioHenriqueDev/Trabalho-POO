@@ -119,7 +119,22 @@ Base.metadata.create_all(engine)# Criação das tabelas no banco de dados
 
 def adicionar_usuario():
     
-    
+    while True:   
+        pergunta_menu = input("1.Cadastro e Login\n2.Sair\nDigite uma dessas opções: ")
+
+        if pergunta_menu == '1':
+           pass
+           break
+
+        elif pergunta_menu == '2':
+            print('Saindo...')
+            sys.exit()
+
+        else:
+            print(90 * '--')
+            print("Erro: Selecione uma das opções(1 ou 2).")
+            print(90 * '--')
+        
 
     
 
@@ -267,9 +282,7 @@ def adicionar_usuario():
         print(f"Erro ao enviar o email {e}")
 
         
-    finally:
-        print('Fim da execução.')
-        print(90 * '--')
+ 
 
     
     
@@ -303,6 +316,7 @@ def adicionar_usuario():
                 print(90 * '--')
                 adicionar_transacao()
                 return usuario  
+            
             else:
                 print("Erro: Senha incorreta.")
                 return
@@ -438,10 +452,10 @@ def adicionar_usuario():
     adicionar_transacao()
     login()
 
+
+
+
 adicionar_usuario()
-
-
-
 
 
 
