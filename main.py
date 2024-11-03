@@ -119,6 +119,10 @@ Base.metadata.create_all(engine)# Criação das tabelas no banco de dados
 
 def adicionar_usuario():
     
+    
+
+    
+
     print(25 * '-')
     print('| CADASTRO DE USUÁRIOS  |')  
     print(25 * '-')
@@ -294,6 +298,9 @@ def adicionar_usuario():
             if bcrypt.checkpw(senha.encode('utf-8'), usuario._senha.encode('utf-8')):
                 print("Usuário autorizado!")
                 print(f"Bem-vindo, {usuario.nome} (ID: {usuario.id})")
+                print(90 * '--')
+                informacao_usuario = print(f'Informações de cadastro\n\nID: {usuario.id}\n\nNome: {usuario.nome}\n\nCPF: {usuario.cpf}\n\nEmail: {usuario.email}\n\nSenha Criptografada: {usuario.senha}\n\nIdade: {usuario.idade}\n\nLimite Mensal: {usuario.limite_mensal}\n\nDinheiro Total: {usuario.dinheiro_total}')
+                print(90 * '--')
                 adicionar_transacao()
                 return usuario  
             else:
@@ -432,6 +439,8 @@ def adicionar_usuario():
     login()
 
 adicionar_usuario()
+
+
 
 
 
