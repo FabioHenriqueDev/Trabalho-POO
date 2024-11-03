@@ -20,8 +20,7 @@ class Usuario(Base):
 
     id = Column('id', Integer, primary_key=True, autoincrement=True)
     nome = Column('nome', String)
-    rua = Column('rua', String)
-    numero = Column('numero', Integer)
+    cpf = Column('cpf', Integer)
     email = Column('email', String)
     _senha = Column('senha', String)
     idade = Column('idade', Integer)
@@ -30,10 +29,9 @@ class Usuario(Base):
     transacoes = relationship("Transacao", back_populates="usuario")
 
     
-    def __init__(self, nome, rua, numero, senha, idade, email, limite_mensal, dinheiro_total):
+    def __init__(self, nome, cpf, senha, idade, email, limite_mensal, dinheiro_total):
         self.nome = nome
-        self.rua = rua
-        self.numero = numero
+        self.cpf = cpf
         self._senha = senha
         self.idade = idade
         self.email = email
@@ -125,131 +123,152 @@ def adicionar_usuario():
     print('| CADASTRO DE USUÁRIOS  |')  
     print(25 * '-')
 
+    
+        
+    nome = input('Digite seu nome completo: ')
+    print(90 * '--')
+    
     try:
-        
-        nome = input('Digite seu nome completo: ')
-        print(90 * '--')
-        rua = input('Digite sua rua: ')
-        print(90 * '--')
+        cpf = input('Digite seu cpf: ')
 
-        
-        try:
-            numero = int(input('Digite o seu número do seu endereço: '))
-            print(90 * '--')
-        except ValueError:
-            print('Erro: Digite um número válido para o número da rua.')
-            sys.exit()  
-
-        
-        email = input('Digite o email: ').lower()
-        
-        if '@' not in email:
-            print('Erro: Email inválido, deve sempre conter @')
-            sys.exit()
-        
-        elif '.' not in email:
-            print("Erro: Email deve conter o .")
-            sys.exit()
-        
-        
-        print(90 * '--')
-        senha = input("Digite sua senha: ")
-        confirme_senha = input("Confirme sua senha: ")
-        if senha == confirme_senha:
-            print('senha adicionada com sucesso.')
-            pass
-        
-        else:
-            print("As senhas nao se coincidem.")
+        if len(cpf) != 11:
+            print("Digite a quantidade correta de digitos de um cpf que é de 11.")
             sys.exit()
 
-        print(90 * '--')
+        if int(cpf) < 0:
+            print('Não é possível adicionar valores negativos.')
+            sys.exit()
+        
+    except ValueError:
+        print('Digite números válidos no cpf.')
+        sys.exit()
+        
+    print(90 * '--')
+
+        
+      
+    email = input('Digite o email: ').lower()
+        
+    if '@' not in email:
+        print('Erro: Email inválido, deve sempre conter @')
+        sys.exit()
+        
+    elif '.' not in email:
+        print("Erro: Email deve conter o .")
+        sys.exit()
+        
+        
+    print(90 * '--')
+    senha = input("Digite sua senha: ")
+    confirme_senha = input("Confirme sua senha: ")
+    if senha == confirme_senha:
+        print('senha adicionada com sucesso.')
+        pass
+        
+    else:
+        print("As senhas nao se coincidem.")
+        sys.exit()
+
+    print(90 * '--')
 
        
-        try:
-            idade = int(input("Digite sua idade: "))
-            print(90 * '--')
-            if idade < 18:
-                print('Você não pode ser cadastrado, porque é menor de idade :(')
-                sys.exit()
-        except ValueError:
-            print('Erro: Digite um número válido para a idade.')
+    try:
+        idade = int(input("Digite sua idade: "))
+            
+        if idade < 0:
+            print('Não é possível adicionar valores negativos.')
             sys.exit()
+            
+        print(90 * '--')
+            
+        if idade < 18:
+            print('Você não pode ser cadastrado, porque é menor de idade :(')
+            sys.exit()
+        
+    except ValueError:
+        print('Erro: Digite um número válido para a idade.')
+        sys.exit()
 
        
-        try:
-            limite_mensal = int(input("Digite seu limite mensal: "))
-            print(90 * '--')
-        except ValueError:
-            print('Erro: Digite um número válido para o limite mensal.')
+    try:
+        limite_mensal = int(input("Digite seu limite mensal: "))
+            
+        if limite_mensal < 0:
+            print('Não é possível adicionar valores negativos.')
             sys.exit()
+            
+        print(90 * '--')
+    except ValueError:
+         print('Erro: Digite um número válido para o limite mensal.')
+         sys.exit()
 
-        try:
-            dinheiro_total = float(input("Digite seu dinheiro total: "))
-            print(90 * '--')
+    try:
+        dinheiro_total = float(input("Digite seu dinheiro total: "))
+            
+        if dinheiro_total < 0:
+            print('Não é possível adicionar valores negativos.')
+            sys.exit()
+            
+        print(90 * '--')
         
-        except ValueError:
-            print('Erro: Digite números válidos')
-
-        
-        usuario = Usuario(
-            nome=nome,
-            rua=rua,
-            numero=numero,
-            email=email,
-            senha=senha,
-            idade=idade,
-            limite_mensal=limite_mensal,
-            dinheiro_total=dinheiro_total
-        )
+    except ValueError:
+        print('Erro: Digite números válidos')
 
         
-        usuario.senha = senha
-        session.add(usuario)
-        session.commit()
-        print("Usuário adicionado com sucesso!")
+    usuario = Usuario(
+        nome=nome,
+        cpf=cpf,
+        email=email,
+        senha=senha,
+        idade=idade,
+        limite_mensal=limite_mensal,
+        dinheiro_total=dinheiro_total
+    )
 
-        remetente = usuario.email
-        senha_remetente = 'rwwwrfybejqwgies'
-        destinatario = usuario.email
-        print('Pegando dados do email...\n\nIsso pode demorar alguns instantes')
         
-        #criação da mensagem de email
-        mensagem = MIMEMultipart()
-        mensagem["From"] = remetente
-        mensagem["To"] = destinatario
-        mensagem["Subject"] = "Confirmação de email"
+    usuario.senha = senha
+    session.add(usuario)
+    session.commit()
+    print("Usuário adicionado com sucesso!")
 
-        #corpo do email
-        corpo_email = f'''
-            <p>Prezados,</p>
+    remetente = usuario.email
+    senha_remetente = 'rwwwrfybejqwgies'
+    destinatario = usuario.email
+    print('Pegando dados do email...\nIsso pode demorar alguns instantes')
+        
+    #criação da mensagem de email
+    mensagem = MIMEMultipart()
+    mensagem["From"] = remetente
+    mensagem["To"] = destinatario
+    mensagem["Subject"] = "Confirmação de email"
 
-            <p>Obrigado por se cadastrar no nosso sistema!</p>
-            {usuario.nome}
+    #corpo do email
+    corpo_email = f'''
+        <p>Prezados,</p>
+
+        <p>Obrigado por se cadastrar no nosso sistema!</p>
+        {usuario.nome}
             '''
         
-        mensagem.attach(MIMEText(corpo_email, "html"))
-        try:
-            #Conexão com servidor smtp
+    mensagem.attach(MIMEText(corpo_email, "html"))
+    try:
+        #Conexão com servidor smtp
             with smtplib.SMTP("smtp.gmail.com", 587) as servidor:
                 servidor.starttls() #Ativa a segurança TLS
                 servidor.login(remetente, senha_remetente)
                 servidor.sendmail(remetente, destinatario, mensagem.as_string())#Enviando email
                 print(f'{usuario.nome}, um email foi enviado para o endereço: {usuario.email}.')
         
-        except Exception as e:
-            print(f"Erro ao enviar o email {e}")
+    except Exception as e:
+        print(f"Erro ao enviar o email {e}")
 
         
-
-
-
-
-
     finally:
         print('Fim da execução.')
         print(90 * '--')
 
+    
+    
     def login():
         print(25 * '-')
         print('| LOGIN DE USUÁRIO      |')
@@ -285,6 +304,8 @@ def adicionar_usuario():
             print(f"Ocorreu um erro durante o login: {e}")
             return
 
+    
+    
     def adicionar_transacao():
         pergunta = input("Você quer fazer alguma transação? S/N ").upper()
         gastos_usuario = 0
@@ -302,6 +323,10 @@ def adicionar_usuario():
 
         try:
             valor = float(input("Digite o valor da transação: "))
+            
+            if valor < 0:
+                print('Não é possível adicionar valores negativos.')
+                sys.exit()
             
 
             if gastos_usuario + valor >= usuario.limite_mensal:
@@ -373,6 +398,11 @@ def adicionar_usuario():
                 
             try:
                 quantidade = int(input("Digite a quantidade do produto que você comprou: "))
+                
+                if quantidade < 0:
+                    print('Não é possível adicionar valores negativos.')
+                    sys.exit()
+                
                 print(90 * '--')
 
             except ValueError:
