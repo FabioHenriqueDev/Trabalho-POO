@@ -180,6 +180,7 @@ def adicionar_usuario():
     print(90 * '--')
     senha = input("Digite sua senha: ")
     confirme_senha = input("Confirme sua senha: ")
+    
     if senha == confirme_senha:
         print('senha adicionada com sucesso.')
         pass
@@ -215,6 +216,7 @@ def adicionar_usuario():
         if limite_mensal < 0:
             print('Não é possível adicionar valores negativos.')
             sys.exit()
+        
             
         print(90 * '--')
     except ValueError:
@@ -226,6 +228,10 @@ def adicionar_usuario():
             
         if dinheiro_total < 0:
             print('Não é possível adicionar valores negativos.')
+            sys.exit()
+
+        if dinheiro_total < limite_mensal:
+            print('Não é possível colocar o o dinheiro total maior que o limite mensal')
             sys.exit()
             
         print(90 * '--')
@@ -312,7 +318,7 @@ def adicionar_usuario():
                 print("Usuário autorizado!")
                 print(f"Bem-vindo, {usuario.nome} (ID: {usuario.id})")
                 print(90 * '--')
-                informacao_usuario = print(f'Informações de cadastro\n\nID: {usuario.id}\n\nNome: {usuario.nome}\n\nCPF: {usuario.cpf}\n\nEmail: {usuario.email}\n\nSenha Criptografada: {usuario.senha}\n\nIdade: {usuario.idade}\n\nLimite Mensal: {usuario.limite_mensal}\n\nDinheiro Total: {usuario.dinheiro_total}')
+                informacao_usuario = print(f'Informações de cadastro\n\nID: {usuario.id}\nNome: {usuario.nome}\nCPF: {usuario.cpf}\nEmail: {usuario.email}\nIdade: {usuario.idade}\nLimite Mensal: {usuario.limite_mensal}\nDinheiro Total: {usuario.dinheiro_total}')
                 print(90 * '--')
                 adicionar_transacao()
                 return usuario  
@@ -351,7 +357,7 @@ def adicionar_usuario():
             
 
             if gastos_usuario + valor >= usuario.limite_mensal:
-                pergunta = input("Essa transação vai passar do seu limite mensal, você tem certeza que quer executala? S/N: ").upper()
+                pergunta = input("Essa transação vai passar do seu limite mensal, você tem certeza que quer executa-la? S/N: ").upper()
                 
                 if pergunta == 'S':
                     pass
@@ -370,7 +376,7 @@ def adicionar_usuario():
             usuario.dinheiro_total -= valor
         
         else:
-            print('Você não tem dinheiro o suficiente para fazer essa compra')
+            print('Você não tem dinheiro o suficiente para fazer essa compra.')
             sys.exit()
         
         tipo_pagamento = input('Qual foi seu tipo de pagamento?\n\n1.Pix\n2.Cartão de débito\n3.Cartão de crédito\n4.Transferência\n5.Outro\nDigite uma das opções: ')
@@ -461,6 +467,7 @@ adicionar_usuario()
 
 
 
+    
 
 
 
