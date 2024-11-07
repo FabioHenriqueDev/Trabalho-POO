@@ -157,7 +157,7 @@ def adicionar_usuario():
     
        
     nome = input('Digite seu nome completo: ')
-    print(90 * '--')
+    print(90 * '-')
     
     try:
         cpf = input('Digite seu cpf: ')
@@ -174,7 +174,7 @@ def adicionar_usuario():
         console.print('Erro: Digite números válidos no cpf.', style='red')
         sys.exit()
         
-    print(90 * '--')
+    print(90 * '-')
 
         
       
@@ -189,7 +189,7 @@ def adicionar_usuario():
         sys.exit()
         
         
-    print(90 * '--')
+    print(90 * '-')
     senha = input("Digite sua senha: ")
     confirme_senha = input("Confirme sua senha: ")
     
@@ -201,7 +201,7 @@ def adicionar_usuario():
         console.print("Erro: As senhas nao se coincidem.", style='red')
         sys.exit()
 
-    print(90 * '--')
+    print(90 * '-')
 
        
     try:
@@ -211,7 +211,7 @@ def adicionar_usuario():
             console.print('Erro: Não é possível adicionar valores negativos.', style='red')
             sys.exit()
             
-        print(90 * '--')
+        print(90 * '-')
             
         if idade < 18:
             console.print('Você não pode ser cadastrado, porque é menor de idade :(', style='yellow')
@@ -230,7 +230,7 @@ def adicionar_usuario():
             sys.exit()
         
             
-        print(90 * '--')
+        print(90 * '-')
     except ValueError:
          console.print('Erro: Digite um número válido para o limite mensal.', style='red')
          sys.exit()
@@ -246,7 +246,7 @@ def adicionar_usuario():
             console.print('Erro: Não é possível colocar o o dinheiro total maior que o limite mensal', style='red')
             sys.exit()
             
-        print(90 * '--')
+        print(90 * '-')
         
     except ValueError:
         console.print('Erro: Digite números válidos', style='red')
@@ -281,7 +281,7 @@ def adicionar_usuario():
 
     #corpo do email
     corpo_email = f'''
-        <p>Prezados,</p>
+        <p>Prezado,</p>
 
         <p>Obrigado por se cadastrar no nosso sistema!</p>
         {usuario.nome}
@@ -329,9 +329,9 @@ def adicionar_usuario():
             if bcrypt.checkpw(senha.encode('utf-8'), usuario._senha.encode('utf-8')):
                 console.print("Usuário autorizado!", style='green')
                 console.print(f"Bem-vindo, {usuario.nome} (ID: {usuario.id})", style='green')
-                print(90 * '--')
+                print(90 * '-')
                 informacao_usuario = print(f'Informações de cadastro\n\nID: {usuario.id}\nNome: {usuario.nome}\nCPF: {usuario.cpf}\nEmail: {usuario.email}\nIdade: {usuario.idade}\nLimite Mensal: {usuario.limite_mensal}\nDinheiro Total: {usuario.dinheiro_total}')
-                print(90 * '--')
+                print(90 * '-')
                 adicionar_transacao()
                 return usuario  
             
@@ -378,7 +378,7 @@ def adicionar_usuario():
                     print('Transação cancelada com sucesso.')
                     sys.exit()
 
-            print(90 * '--')
+            print(90 * '-')
         
         except ValueError:
             console.print('Erro: Digite um número válido.', style='red')
@@ -414,7 +414,7 @@ def adicionar_usuario():
             console.print('Erro: Você não digitou nenhuma das opções parando a execução do programa.', style='red')
             sys.exit()
 
-        print(90 * '--')
+        print(90 * '-')
         data_transacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  
         dono = usuario.id
 
@@ -434,7 +434,7 @@ def adicionar_usuario():
 
         def adicionar_produtos():
             nome_produto = input("Digite o nome do produto: ")
-            print(90 * '--')
+            print(90 * '-')
                 
             try:
                 quantidade = int(input("Digite a quantidade do produto que você comprou: "))
@@ -443,7 +443,7 @@ def adicionar_usuario():
                     console.print('Não é possível adicionar valores negativos.', style='red')
                     sys.exit()
                 
-                print(90 * '--')
+                print(90 * '-')
 
             except ValueError:
                 console.print('Erro: Digite um número válido para a quantidade de produtos', style='red')
